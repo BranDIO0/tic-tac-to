@@ -1,0 +1,25 @@
+:root {
+  /* Light Theme (Default) */
+  --bg-primary: #ffffff;
+  --bg-secondary: #f3f4f6;
+  --text-primary: #1f2937;
+  --accent-color: #3b82f6;
+  --board-grid: #e5e7eb;
+  --cell-hover: #f9fafb;
+}
+
+[data-theme='dark'] {
+  /* Dark Theme Values */
+  --bg-primary: #111827;
+  --bg-secondary: #1f2937;
+  --text-primary: #f9fafb;
+  --accent-color: #60a5fa;
+  --board-grid: #374151;
+  --cell-hover: #374151;
+}
+
+body {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  transition: background-color 0.3s, color 0.3s; /* Animation für Theme-Wechsel */
+}
