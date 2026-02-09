@@ -74,6 +74,8 @@ export const useGameStore = defineStore('game', {
         const response = await httpClient.post('/games', { mode });
         const data = response.data;
         this.currentGame = data;
+        // FIX: Wir merken uns lokal, dass wir der Ersteller (X) sind
+        localStorage.setItem(`role_${data.gameId}`, 'X');
         return data.gameId;
       } catch (e) {
         this.error = "Konnte Spiel nicht erstellen.";
@@ -89,6 +91,8 @@ export const useGameStore = defineStore('game', {
         const response = await httpClient.post(`/games/${gameId}/join`);
         const data = response.data;
         this.currentGame = data;
+        // FIX: Wir merken uns lokal, dass wir der Beitretende (O) sind
+        localStorage.setItem(`role_${data.gameId}`, 'O');
         return data.gameId;
       } catch (e) {
         this.error = "Konnte Spiel nicht beitreten.";

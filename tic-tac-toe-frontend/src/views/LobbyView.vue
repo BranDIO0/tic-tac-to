@@ -47,7 +47,7 @@ const joinGame = async (gameId: string) => {
       <h1>Spiel-Lobby</h1>
       <p>Hallo, <strong>{{ playerStore.player?.name }}</strong></p>
       <div class="stats-bar">
-        <span>🏆 {{ gameStore.stats.wins }} Siege</span> | <span>💀 {{ gameStore.stats.losses }} Niederlagen</span> | <span>🤝 {{ gameStore.stats.draws }} Unentschieden</span>
+        <span>{{ gameStore.stats.wins }} Siege</span> | <span>{{ gameStore.stats.losses }} Niederlagen</span> | <span>{{ gameStore.stats.draws }} Unentschieden</span>
       </div>
     </header>
 
@@ -56,7 +56,7 @@ const joinGame = async (gameId: string) => {
         <h2>Neues Spiel starten</h2>
         <div class="button-group">
           <button @click="createGame('PVC')" class="btn-primary">
-            🤖 Gegen Computer
+            Gegen Computer
           </button>
           <button @click="createGame('PVP')" class="btn-secondary">
             👥 Gegen Spieler (PVP)
