@@ -3,10 +3,16 @@
 const props = defineProps<{
   board: string[][];
   isMyTurn: boolean;
+  winningLine?: number[][] | null;
 }>();
 
 // Wir senden ein Event nach oben, wenn geklickt wird
 const emit = defineEmits(['cell-click']);
+
+const isWinningCell = (rowIndex: number, colIndex: number) => {
+  if (!props.winningLine) return false;
+  return props.winningLine.some(([r, c]) => r === rowIndex && c === colIndex);
+};
 
 const handleClick = (rowIndex: number, colIndex: number, cellValue: string) => {
   // Nur klicken erlauben, wenn Zelle leer ist UND wir am Zug sind
@@ -28,7 +34,7 @@ const handleClick = (rowIndex: number, colIndex: number, cellValue: string) => {
           v-for="(cell, colIndex) in row" 
           :key="`${rowIndex}-${colIndex}`"
           class="cell"
-          :class="{ 'clickable': cell === '' && isMyTurn }"
+          :class="{ 'clickable': cell === '' && isMyTurn, 'winner': isWinningCell(rowIndex, colIndex) }"
           @click="handleClick(rowIndex, colIndex, cell)"
         >
           <span v-if="cell === 'X'" class="symbol x">X</span>
@@ -79,6 +85,11 @@ const handleClick = (rowIndex: number, colIndex: number, cellValue: string) => {
   &.clickable:hover {
     background-color: #f3f4f6; /* Leichtes Grau beim Drüberfahren */
     cursor: pointer;
+  }
+
+  &.winner {
+    background-color: #fcd34d;
+    border: 2px solid #f59e0b;
   }
 }
 

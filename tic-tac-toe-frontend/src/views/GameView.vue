@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, computed, onUnmounted } from 'vue';
+import { onMounted, computed } from 'vue';
 import { useRoute } from 'vue-router';
 import { useGameStore } from '../stores/game';
 import { usePlayerStore } from '../stores/player';
@@ -11,7 +11,6 @@ const playerStore = usePlayerStore();
 
 // Game-ID aus der URL
 const gameId = route.params.id as string;
-let pollingInterval: number | null = null;
 
 // Prüfung: Bin ich am Zug?
 const isMyTurn = computed(() => {
@@ -50,6 +49,45 @@ const handleMove = async (row: number, col: number) => {
   await gameStore.makeMove(row, col);
 };
 
+// Gewinnlinie berechnen
+const winningLine = computed(() => {
+  const game = gameStore.currentGame;
+  if (!game || game.status !== 'FINISHED' || !game.winner || game.winner === 'DRAW') {
+    return null;
+  }
+  
+  const b = game.board;
+  const w = game.winner;
+  
+  // Reihen prüfen
+  for (let i = 0; i < 3; i++) {
+    if (b[i]?.[0] === w && b[i]?.[1] === w && b[i]?.[2] === w) return [[i,0], [i,1], [i,2]];
+  }
+  // Spalten prüfen
+  for (let i = 0; i < 3; i++) {
+    if (b[0]?.[i] === w && b[1]?.[i] === w && b[2]?.[i] === w) return [[0,i], [1,i], [2,i]];
+  }
+  // Diagonalen prüfen
+  if (b[0]?.[0] === w && b[1]?.[1] === w && b[2]?.[2] === w) return [[0,0], [1,1], [2,2]];
+  if (b[0]?.[2] === w && b[1]?.[1] === w && b[2]?.[0] === w) return [[0,2], [1,1], [2,0]];
+  
+  return null;
+});
+
+// Ergebnis-Text für Modal
+const gameResult = computed(() => {
+  const game = gameStore.currentGame;
+  if (!game || game.status !== 'FINISHED') return null;
+  
+  if (game.winner === 'DRAW') {
+    return { title: 'Unentschieden! 🤝', message: 'Ein ausgeglichenes Spiel.', type: 'draw' };
+  }
+
+  // Einfache Gewinnanzeige basierend auf dem Gewinner-Symbol
+  const winnerText = `Spieler ${game.winner} hat gewonnen!`;
+  return { title: 'Spiel beendet! 🏆', message: winnerText, type: 'win' };
+});
+
 onMounted(async () => {
   // 1. Initiale Daten per REST holen (Sicherheit)
   await gameStore.fetchGame(gameId);
@@ -73,12 +111,22 @@ onMounted(async () => {
     <GameBoard 
       :board="gameStore.currentGame.board"
       :is-my-turn="isMyTurn" 
+      :winning-line="winningLine"
       @cell-click="handleMove"
     />
 
     <div class="info">
       <p class="game-id-text">Spiel-ID: {{ gameId }}</p>
       <router-link to="/lobby" class="btn-back">Zurück zur Lobby</router-link>
+    </div>
+
+    <!-- Game Over Modal -->
+    <div v-if="gameStore.currentGame.status === 'FINISHED' && gameResult" class="modal-overlay">
+      <div class="modal-content">
+        <h2>{{ gameResult.title }}</h2>
+        <p>{{ gameResult.message }}</p>
+        <router-link to="/lobby" class="btn-lobby">Zurück zur Lobby</router-link>
+      </div>
     </div>
   </div>
   
@@ -128,6 +176,44 @@ h1 { margin-bottom: 0.5rem; }
   font-weight: 500;
   
   &:hover { text-decoration: underline; }
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 100;
+}
+
+.modal-content {
+  background: white;
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  text-align: center;
+  max-width: 90%;
+  width: 400px;
+
+  h2 { margin-top: 0; color: #1f2937; }
+  p { font-size: 1.2rem; margin-bottom: 1.5rem; color: #4b5563; }
+}
+
+.btn-lobby {
+  background: #2563eb;
+  color: white;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: bold;
+  transition: background 0.2s;
+  
+  &:hover { background: #1d4ed8; }
 }
 
 .loading {
