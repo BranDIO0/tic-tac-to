@@ -10,6 +10,7 @@ export const useGameStore = defineStore('game', {
     isLoading: false,
     error: null as string | null,
     socket: null as GameSocket | null, // NEU: Referenz auf den Socket
+    stats: { wins: 0, losses: 0, draws: 0 },
   }),
 
   actions: {
@@ -37,6 +38,34 @@ export const useGameStore = defineStore('game', {
       } finally {
         this.isLoading = false;
       }
+    },
+
+    loadStats() {
+      const s = localStorage.getItem('tictacgo_stats');
+      if (s) {
+        try {
+          this.stats = JSON.parse(s);
+        } catch (e) { console.error("Stats parse error", e); }
+      }
+    },
+
+    updateLocalStats(game: GameState) {
+      if (!game.winner) return;
+      
+      const playerId = localStorage.getItem('playerId');
+      let mySymbol = 'X'; // Standard für PVC oder Ersteller
+      if (game.mode === 'PVP' && game.createdBy && game.createdBy.playerId !== playerId) {
+        mySymbol = 'O';
+      }
+      
+      if (game.winner === 'DRAW') {
+        this.stats.draws++;
+      } else if (game.winner === mySymbol) {
+        this.stats.wins++;
+      } else {
+        this.stats.losses++;
+      }
+      localStorage.setItem('tictacgo_stats', JSON.stringify(this.stats));
     },
 
     async createGame(mode: GameMode) {
@@ -130,10 +159,12 @@ export const useGameStore = defineStore('game', {
       } catch (e: any) {
         console.error("Fehler beim Zug:", e);
         if (e.response) {
-            // Zeige uns genau, was der Server antwortet
-            console.error("Server Status:", e.response.status);
-            console.error("Server Daten:", e.response.data);
-            alert(`Server verweigert Zug: ${JSON.stringify(e.response.data)}`);
+            // Fehler im State speichern statt alert()
+            let msg = "Zug verweigert";
+            if (e.response.data && e.response.data.message) {
+                msg = e.response.data.message;
+            }
+            this.error = msg;
         }
       }
     },
@@ -165,6 +196,8 @@ export const useGameStore = defineStore('game', {
 
         let updateData = message;
 
+        const oldStatus = this.currentGame?.status;
+
         // 1. Unwrapping: Falls der Server { type: 'state', payload: ... } sendet
         if (message && message.type === 'state' && message.payload) {
             updateData = message.payload;
@@ -175,6 +208,11 @@ export const useGameStore = defineStore('game', {
             this.currentGame = { ...this.currentGame, ...updateData };
         } else {
             this.currentGame = updateData;
+        }
+
+        // Statistik aktualisieren bei Spielende
+        if (oldStatus !== 'FINISHED' && this.currentGame?.status === 'FINISHED') {
+            this.updateLocalStats(this.currentGame);
         }
       });
     },

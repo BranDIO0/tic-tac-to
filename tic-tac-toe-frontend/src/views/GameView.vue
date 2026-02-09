@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, computed } from 'vue';
+import { onMounted, computed, watch, ref } from 'vue';
 import { useRoute } from 'vue-router';
 import { useGameStore } from '../stores/game';
 import { usePlayerStore } from '../stores/player';
@@ -40,7 +40,11 @@ const statusText = computed(() => {
     return `🏆 Gewinner: ${game.winner}`;
   }
   
-  return `Am Zug: ${game.currentTurn}`; 
+  if (isMyTurn.value) {
+    return "Du bist am Zug";
+  } else {
+    return "Gegner überlegt...";
+  }
 });
 
 // Zug machen
@@ -88,6 +92,19 @@ const gameResult = computed(() => {
   return { title: 'Spiel beendet! 🏆', message: winnerText, type: 'win' };
 });
 
+// Fehleranzeige
+const showError = ref(false);
+
+watch(() => gameStore.error, (newVal) => {
+  if (newVal) {
+    showError.value = true;
+    setTimeout(() => {
+      showError.value = false;
+      gameStore.error = null;
+    }, 3000);
+  }
+});
+
 onMounted(async () => {
   // 1. Initiale Daten per REST holen (Sicherheit)
   await gameStore.fetchGame(gameId);
@@ -103,7 +120,7 @@ onMounted(async () => {
     <header>
       <h1>Tic Tac Toe</h1>
       
-      <div class="status-badge" :class="{'finished': gameStore.currentGame.status === 'FINISHED'}">
+      <div class="status-badge" :class="{'finished': gameStore.currentGame.status === 'FINISHED', 'my-turn': isMyTurn, 'opponent-turn': !isMyTurn && gameStore.currentGame.status === 'IN_PROGRESS'}">
         {{ statusText }}
       </div>
     </header>
@@ -114,6 +131,10 @@ onMounted(async () => {
       :winning-line="winningLine"
       @cell-click="handleMove"
     />
+
+    <div v-if="showError" class="error-toast">
+      {{ gameStore.error }}
+    </div>
 
     <div class="info">
       <p class="game-id-text">Spiel-ID: {{ gameId }}</p>
@@ -159,6 +180,16 @@ h1 { margin-bottom: 0.5rem; }
   &.finished {
     background: #fcd34d; /* Gold für Spielende */
     color: #000;
+  }
+
+  &.my-turn {
+    background: #10b981; /* Grün */
+    color: white;
+  }
+
+  &.opponent-turn {
+    background: #f59e0b; /* Gelb/Orange */
+    color: white;
   }
 }
 
@@ -224,4 +255,16 @@ h1 { margin-bottom: 0.5rem; }
   font-size: 1.5rem;
   color: #6b7280;
 }
+
+.error-toast {
+  background-color: #ef4444;
+  color: white;
+  padding: 0.75rem;
+  border-radius: 8px;
+  margin: 1rem auto;
+  max-width: 300px;
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
 </style>

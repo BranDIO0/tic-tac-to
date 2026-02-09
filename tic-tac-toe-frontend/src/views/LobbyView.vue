@@ -11,6 +11,7 @@ const router = useRouter();
 // Beim Laden der Seite die Liste der Spiele holen
 onMounted(() => {
   gameStore.fetchAvailableGames();
+  gameStore.loadStats();
   // Polling alle 5 Sekunden, um die Liste aktuell zu halten
   setInterval(() => gameStore.fetchAvailableGames(), 5000);
 });
@@ -45,6 +46,9 @@ const joinGame = async (gameId: string) => {
     <header>
       <h1>Spiel-Lobby</h1>
       <p>Hallo, <strong>{{ playerStore.player?.name }}</strong></p>
+      <div class="stats-bar">
+        <span>🏆 {{ gameStore.stats.wins }} Siege</span> | <span>💀 {{ gameStore.stats.losses }} Niederlagen</span> | <span>🤝 {{ gameStore.stats.draws }} Unentschieden</span>
+      </div>
     </header>
 
     <div class="lobby-grid">
@@ -157,4 +161,14 @@ const joinGame = async (gameId: string) => {
 }
 
 .empty-state { color: #888; font-style: italic; }
+
+.stats-bar {
+  margin-top: 0.5rem;
+  font-size: 0.9rem;
+  color: #666;
+  background: rgba(255,255,255,0.5);
+  padding: 0.5rem;
+  border-radius: 8px;
+  display: inline-block;
+}
 </style>
