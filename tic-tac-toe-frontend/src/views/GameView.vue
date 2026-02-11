@@ -24,13 +24,9 @@ const mySymbol = computed(() => {
   // Im PVC Modus ist der Spieler immer X
   if (game.mode === 'PVC') return 'X';
   
-  // FIX: Zuerst prüfen, ob wir die Rolle lokal gespeichert haben
-  // Das umgeht das Problem, dass das Backend 'createdBy' oft nicht mitsendet
   const savedRole = localStorage.getItem(`role_${game.gameId}`);
   if (savedRole) return savedRole;
 
-  // Im PVP Modus: Vergleich mit createdBy
-  // WICHTIG: Wir nutzen zuerst den Store (Memory), da localStorage von anderen Tabs überschrieben sein könnte
   const myPlayerId = playerStore.player?.id || localStorage.getItem('playerId');
   console.log("My ID (Store/Storage):", myPlayerId);
   console.log("Game Creator ID:", game.createdBy?.playerId);
@@ -40,7 +36,7 @@ const mySymbol = computed(() => {
     return 'X';
   }
 
-  // Fallback: Prüfen auf playerXID oder playerXId (falls Backend das sendet)
+  // Prüfen auf playerXID oder playerXId (falls Backend das sendet)
   const g = game as any;
   if (g.playerXID === myPlayerId || g.playerXId === myPlayerId || (g.playerX && g.playerX.playerId === myPlayerId)) {
     return 'X';
@@ -48,7 +44,7 @@ const mySymbol = computed(() => {
   return 'O';
 });
 
-// Prüfung: Bin ich am Zug?
+// Bin ich am Zug?
 const isMyTurn = computed(() => {
   const game = gameStore.currentGame;
   // Wenn Computer denkt, ist der Spieler nicht am Zug (UI blockieren)
@@ -81,7 +77,7 @@ const statusText = computed(() => {
   if (game.status === 'WAITING_FOR_PLAYER') return "Warte auf Mitspieler...";
   
   if (game.status === 'FINISHED') {
-    if (game.winner === 'DRAW') return "🤝 Unentschieden!";
+    if (game.winner === 'DRAW') return "Unentschieden!";
     // Zeige an, wer gewonnen hat
     return `🏆 Gewinner: ${game.winner}`;
   }
@@ -91,7 +87,7 @@ const statusText = computed(() => {
   }
 
   if (isMyTurn.value) {
-    return "🟢 Dein Zug";
+    return "Dein Zug";
   } else {
     return "⏳ Gegner denkt nach...";
   }
@@ -121,7 +117,7 @@ const handleMove = async (row: number, col: number) => {
     // 2 Sekunden warten bevor das echte Ergebnis (mit Computer-Zug) angezeigt wird
     setTimeout(() => {
       isComputerThinking.value = false;
-    }, 2000);
+    }, 1500);
 
   } else {
     // PVP: Normaler Ablauf
@@ -160,7 +156,7 @@ const gameResult = computed(() => {
   if (!game || game.status !== 'FINISHED') return null;
   
   if (game.winner === 'DRAW') {
-    return { title: 'Unentschieden! 🤝', message: 'Ein ausgeglichenes Spiel.', type: 'draw' };
+    return { title: 'Unentschieden!', message: 'Ein ausgeglichenes Spiel.', type: 'draw' };
   }
 
   // Einfache Gewinnanzeige basierend auf dem Gewinner-Symbol
@@ -229,7 +225,6 @@ onMounted(async () => {
       <router-link to="/lobby" class="btn-back">Zurück zur Lobby</router-link>
     </div>
 
-    <!-- Game Over Modal -->
     <div v-if="gameStore.currentGame.status === 'FINISHED' && gameResult" class="modal-overlay">
       <div class="modal-content">
         <h2>{{ gameResult.title }}</h2>
@@ -272,7 +267,7 @@ h1 { margin-bottom: 0.5rem; }
 }
 
 .status-badge {
-  background: var(--glass-bg); /* Adaptiver Hintergrund für Lesbarkeit im Dark Mode */
+  background: var(--glass-bg);
   backdrop-filter: blur(10px);
   padding: 0.8rem 2rem;
   border-radius: 16px;

@@ -13,7 +13,6 @@ const httpClient = axios.create({
 httpClient.interceptors.request.use(config => {
   const playerId = localStorage.getItem('playerId');
   if (playerId) {
-    // WICHTIG: Schreibweise wie im Bash-Script Zeile 44
     config.headers['X-Player-Id'] = playerId; 
   }
   return config;
@@ -23,7 +22,7 @@ httpClient.interceptors.request.use(config => {
 httpClient.interceptors.response.use(
   (response) => response,
   (error) => {
-    // Optional: Logging für Debugging
+    // Logging für Debugging
     if (error.response) {
        console.error('API Error:', error.response.status, error.response.data);
     }

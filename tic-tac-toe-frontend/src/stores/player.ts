@@ -11,7 +11,7 @@ export const usePlayerStore = defineStore('player', {
   }),
 
   actions: {
-    // Initialisierung beim App-Start (Auto-Login aus LocalStorage)
+    // Initialisierung beim App-Start
     initialize() {
       const storedId = localStorage.getItem('playerId');
       const storedName = localStorage.getItem('playerName');
@@ -20,7 +20,7 @@ export const usePlayerStore = defineStore('player', {
         this.player = {
           id: storedId,
           name: storedName,
-          symbol: 'X' // Standardwert, wird im Spiel ggf. überschrieben
+          symbol: 'X' 
         };
         this.isAuthenticated = true;
       }
@@ -32,23 +32,20 @@ export const usePlayerStore = defineStore('player', {
       this.error = null;
 
       try {
-        // Wir nutzen hier direkt axios, wie von dir gewünscht
         const response = await axios.post('http://localhost:8080/players', { name });
         const data = response.data;
 
-        // DEBUG: Zeigt die Server-Antwort in der Browser-Konsole
+        // Zeigt die Server-Antwort in der Browser-Konsole
         console.log("Server Antwort Rohdaten:", data);
 
-        // MAPPING FIX:
         // Der Server schickt "playerId", aber unser Frontend erwartet "id".
-        // Wir prüfen alle Schreibweisen zur Sicherheit.
+        // prüfe alle Schreibweisen zur Sicherheit.
         const safePlayer = {
             id: data.playerId || data.id || data.ID, 
             name: data.name || data.Name,
             symbol: data.symbol || data.Symbol || 'X'
         };
 
-        // Sicherheitscheck: Haben wir wirklich eine ID bekommen?
         if (!safePlayer.id) {
             throw new Error("Server hat keine gültige ID zurückgegeben.");
         }
@@ -75,7 +72,6 @@ export const usePlayerStore = defineStore('player', {
         this.isAuthenticated = false;
         localStorage.removeItem('playerId');
         localStorage.removeItem('playerName');
-        // Optional: Seite neu laden, um State komplett zu leeren
         window.location.reload(); 
     }
   }

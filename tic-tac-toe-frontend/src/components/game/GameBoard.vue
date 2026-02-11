@@ -55,8 +55,8 @@ const handleClick = (rowIndex: number, colIndex: number, cellValue: string) => {
 .board {
   display: flex;
   flex-direction: column;
-  gap: 8px; /* Das sind die Gitterlinien (der Abstand zwischen den Zellen) */
-  background-color: #333333; /* Dunkler Hintergrund macht die Linien sichtbar */
+  gap: 8px; 
+  background-color: #333333; 
   padding: 8px;
   border-radius: 12px;
   box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
@@ -64,13 +64,13 @@ const handleClick = (rowIndex: number, colIndex: number, cellValue: string) => {
 
 .row {
   display: flex;
-  gap: 8px; /* Abstand horizontal */
+  gap: 8px;
 }
 
 .cell {
   width: 90px;
   height: 90px;
-  background-color: #ffffff; /* Weiße Zellen */
+  background-color: #ffffff;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -83,7 +83,7 @@ const handleClick = (rowIndex: number, colIndex: number, cellValue: string) => {
   transition: background-color 0.3s;
 
   &.clickable:hover {
-    background-color: #f3f4f6; /* Leichtes Grau beim Drüberfahren */
+    background-color: #f3f4f6; 
     cursor: pointer;
   }
 
@@ -93,6 +93,6 @@ const handleClick = (rowIndex: number, colIndex: number, cellValue: string) => {
   }
 }
 
-.symbol.x { color: #2563eb; /* Blau für X */ }
-.symbol.o { color: #dc2626; /* Rot für O */ }
+.symbol.x { color: #2563eb; }
+.symbol.o { color: #dc2626; }
 </style>

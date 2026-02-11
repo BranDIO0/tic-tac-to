@@ -21,7 +21,7 @@ const createGame = async (mode: 'PVP' | 'PVC') => {
   try {
     const newGameId = await gameStore.createGame(mode);
     if (newGameId) {
-      // WICHTIG: Wir nutzen die ID für die URL
+      // Wir nutzen die ID für die URL
       router.push({ name: 'Game', params: { id: newGameId } });
     }
   } catch (e) {

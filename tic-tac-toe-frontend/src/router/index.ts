@@ -21,7 +21,7 @@ const router = createRouter({
       path: '/game/:id', 
       name: 'Game', 
       component: GameView, 
-      props: true // Erlaubt Zugriff auf die ID via Props
+      props: true 
     },
   ]
 });

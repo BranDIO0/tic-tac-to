@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 
-// Wir definieren Events, die diese Komponente nach außen sendet
 const emit = defineEmits(['submit']);
 
 const playerName = ref('');
@@ -33,9 +32,9 @@ const handleSubmit = () => {
 </template>
 
 <style scoped lang="scss">
-/* Minimales Styling für den Start */
+
 .player-form-card {
-  background: var(--bg-secondary); /* Nutzt Theme-Variable */
+  background: var(--bg-secondary);
   padding: 2rem;
   border-radius: 8px;
   box-shadow: 0 4px 6px rgba(0,0,0,0.1);

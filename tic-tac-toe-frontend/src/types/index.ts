@@ -1,5 +1,5 @@
 export type Player = {
-    id: string; // Hier scheint der Server manchmal "id" und manchmal "playerId" zu nutzen, wir mappen das im Store
+    id: string; 
     name: string;
     symbol: 'X' | 'O';
   };
@@ -15,14 +15,12 @@ export interface GameState {
   currentTurn: string;
   status: GameStatus;
   winner: string;
-  // NEU: Damit wir den Ersteller-Namen anzeigen können
   createdBy?: {
       playerId: string;
       name: string;
   };
 }
 
-// Für Erweiterung 9 (Lokale Historie) 
 export interface LocalGameRecord {
   gameId: string;
   opponent: string;

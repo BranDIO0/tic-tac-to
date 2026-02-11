@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 import httpClient from '../api/httpClient';
-import { GameSocket } from '../api/socketService'; // NEU
+import { GameSocket } from '../api/socketService'; 
 import type { GameState, GameMode } from '../types';
 
 export const useGameStore = defineStore('game', {
@@ -9,7 +9,7 @@ export const useGameStore = defineStore('game', {
     availableGames: [] as GameState[],
     isLoading: false,
     error: null as string | null,
-    socket: null as GameSocket | null, // NEU: Referenz auf den Socket
+    socket: null as GameSocket | null, // Referenz auf den Socket
     stats: { wins: 0, losses: 0, draws: 0 },
   }),
 
@@ -22,7 +22,7 @@ export const useGameStore = defineStore('game', {
           params: { mode: 'PVP', status: 'WAITING_FOR_PLAYER' }
         });
         
-        // KORREKTUR: Der Server wickelt die Liste in ein "games" Objekt ein!
+        // Der Server wickelt die Liste in ein "games" Objekt ein!
         // Wir prüfen sicherheitshalber, ob .games existiert.
         if (response.data.games) {
             this.availableGames = response.data.games;
@@ -101,35 +101,7 @@ export const useGameStore = defineStore('game', {
         this.isLoading = false;
       }
     },
-/*
-    async makeMove(row: number, col: number) {
-      if (!this.currentGame) return;
 
-      try {
-        // WICHTIG: Wir wandeln die Werte explizit in Integers um!
-        // Der Server stürzt ab oder lehnt ab, wenn wir Strings ("0") senden.
-        const payload = {
-            row: parseInt(row.toString()), 
-            col: parseInt(col.toString())
-        };
-
-        console.log("Sende Zug:", payload);
-
-        // API Aufruf: POST /games/{id}/moves
-        await httpClient.post(`/games/${this.currentGame.gameId}/moves`, payload);
-        
-        // Kein manuelles Update nötig, da der WebSocket das gleich erledigt!
-        
-      } catch (e: any) {
-        // Detaillierte Fehleranalyse
-        console.error("Fehler beim Zug:", e);
-        if (e.response) {
-            console.error("Server Antwort Body:", e.response.data);
-            alert(`Server verweigert Zug: ${JSON.stringify(e.response.data)}`);
-        }
-      }
-    },
-*/
     async makeMove(row: number, col: number) {
       if (!this.currentGame) return;
 
@@ -142,7 +114,7 @@ export const useGameStore = defineStore('game', {
         const playerId = localStorage.getItem('playerId');
         console.log(`Sende Zug als Spieler ${playerId}:`, payload);
 
-        // LÖSUNG: Wir senden den Header hier MANUELL mit, um sicherzugehen.
+        // Wir senden den Header hier MANUELL mit, um sicherzugehen.
         // Wir nutzen exakt die Schreibweise aus dem Bash-Script: "X-Player-Id"
         const config = {
             headers: {
@@ -183,7 +155,7 @@ export const useGameStore = defineStore('game', {
       }
     },
 
-    // NEU: WebSocket Verbindung starten
+    // WebSocket Verbindung starten
     connectToGame(gameId: string) {
       // Alten Socket schließen, falls vorhanden
       if (this.socket) {
@@ -195,7 +167,7 @@ export const useGameStore = defineStore('game', {
       
       // Verbinden und Callback definieren: Was passiert bei Updates?
       this.socket.connect((message: any) => {
-        // DEBUG: Zeigt genau, was vom Server kommt
+        // Zeigt genau, was vom Server kommt
         console.log("WebSocket Update empfangen:", message);
 
         let updateData = message;

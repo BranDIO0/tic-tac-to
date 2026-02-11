@@ -1,6 +1,4 @@
 <script setup lang="ts">
-// Die App.vue dient als Rahmen. 
-// Der Router entscheidet, ob HomeView oder LobbyView angezeigt wird.
 </script>
 
 <template>
